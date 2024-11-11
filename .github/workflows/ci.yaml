@@ -2,8 +2,9 @@ name: CI
 
 on:
   pull_request:
-    # paths:
-    #   - testapp/**
+    paths:
+      - **
+      # - testapp/**
 
 jobs:
   helm-template:
