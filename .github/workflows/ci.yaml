@@ -29,17 +29,19 @@ jobs:
           script: |
             const fs = require("fs");
             const output = fs.readFileSync("/tmp/template_output", "utf8");
+            
+            const commentBody = `### Helm Template Output
+            <details><summary>Show Output</summary>
+
+            \`\`\`yaml
+            ${output}
+            \`\`\`
+
+            </details>`;
+            
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### Helm Template Output
-<details><summary>Show Output</summary>
-
-\`\`\`yaml
-${output}
-\`\`\`
-
-</details>`
+              body: commentBody
             });
-
