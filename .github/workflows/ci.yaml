@@ -10,6 +10,13 @@ on:
 jobs:
   helm-template:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+      pull-requests: write
+
     strategy:
       matrix:
         chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
