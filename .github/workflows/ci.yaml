@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate Helm Template
         run: |
-          helm template -f testapp/values.yaml ./testapp > /tmp/template_output
+          helm template -f testapp/values.yaml ./${{ matrix.chart }} > /tmp/template_output
 
       - name: Post Template as PR Comment
         uses: actions/github-script@v7
@@ -39,7 +39,7 @@ jobs:
             const fs = require("fs");
             const output = fs.readFileSync("/tmp/template_output", "utf8");
             
-            const commentBody = `### Helm Template Output
+            const commentBody = `### Helm Template Output ${{ matrix.chart }}
             <details><summary>Show Output</summary>
 
             \`\`\`yaml
