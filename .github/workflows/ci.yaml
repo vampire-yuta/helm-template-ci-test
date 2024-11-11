@@ -3,15 +3,17 @@ name: CI
 on:
   pull_request:
     paths:
-      - test**
+      - testapp/**
+      - testapp2/**
+      - testapp3/**
 
 jobs:
   helm-template:
-    name: Helm Template Output
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    strategy:
+      matrix:
+        chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -19,47 +21,29 @@ jobs:
       - name: Setup Helm
         uses: azure/setup-helm@v4
 
-      - name: Detect Changed Directories
-        id: detect_changes
+      - name: Generate Helm Template
         run: |
-          echo "## Detecting changed directories"
-          CHANGED_DIRS=$(git diff --name-only HEAD^ HEAD | awk -F/ '{print $1}' | sort -u | uniq)
-          echo "Changed directories: $CHANGED_DIRS"
-          echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_ENV
+          helm template -f testapp/values.yaml ./testapp > /tmp/template_output
 
-      - name: Generate Helm Templates
-        id: generate_templates
-        run: |
-          echo "## Generating Helm templates"
-          mkdir -p /tmp/templates
-          for dir in $CHANGED_DIRS; do
-            if [ -f "$dir/values.yaml" ]; then
-              echo "Processing $dir"
-              helm template -f $dir/values.yaml ./$dir > /tmp/templates/${dir}_template_output.yaml
-            fi
-          done
-
-      - name: Post Templates as PR Comment
+      - name: Post Template as PR Comment
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require("fs");
-            const path = require("path");
+            const output = fs.readFileSync("/tmp/template_output", "utf8");
+            
+            const commentBody = `### Helm Template Output
+            <details><summary>Show Output</summary>
 
-            // Collect all templates
-            const templatesDir = "/tmp/templates";
-            const files = fs.readdirSync(templatesDir);
-            let commentBody = "### Helm Template Outputs\n\n";
-            files.forEach(file => {
-              const content = fs.readFileSync(path.join(templatesDir, file), "utf8");
-              commentBody += `<details><summary>${file}</summary>\n\n\`\`\`yaml\n${content}\n\`\`\`\n\n</details>\n\n`;
-            });
+            \`\`\`yaml
+            ${output}
+            \`\`\`
 
-            // Post comment
+            </details>`;
+            
             github.rest.issues.createComment({
               issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: commentBody
             });
-
