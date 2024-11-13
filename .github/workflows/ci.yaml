@@ -23,6 +23,23 @@ jobs:
           echo ${dirs}
           echo "::set-output name=dirs::${dirs}"
 
+  helm-lint:
+    needs: set-changed-dirs
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: "v3.16.2"
+
+      - name: Execute Helm Lint
+        run: |
+          helm lint -f testapp/values.yaml ./${{ matrix.chart }}
+
   helm-template:
     needs: set-changed-dirs
     runs-on: ubuntu-24.04
@@ -36,7 +53,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
         chart: ${{ fromJson(needs.set-changed-dirs.outputs.dirs) }}
 
     steps:
