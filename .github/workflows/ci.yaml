@@ -23,7 +23,7 @@ jobs:
           DIRS='${dirs}'
           echo $DIRS
           # echo "::set-output name=dirs::${dirs}"
-          echo "dirs='${dirs}'" >> $GITHUB_OUTPUT
+          echo "dirs=$(echo \'$dirs\')" >> $GITHUB_OUTPUT
 
   helm-template:
     needs: set-changed-dirs
