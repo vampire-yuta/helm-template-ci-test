@@ -17,7 +17,7 @@ jobs:
       - name: Fild changed directories
         id: find-changed-dirs
         run: |
-          dirs=$(git diff --name-only origin/main -- | awk -F'/' '{print $1}' | jq -R . | jq -s . | grep test)
+          dirs=$(git diff --name-only main | awk -F'/' '{print $1}' | jq -R . | jq -s . | grep test)
           echo $dirs # 確認用
           echo "::set-output name=dirs::${dirs}"
 
