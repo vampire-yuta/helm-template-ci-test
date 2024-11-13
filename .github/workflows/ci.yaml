@@ -19,7 +19,8 @@ jobs:
         run: |
           git fetch
           dirs=$(git diff --name-only HEAD..origin/main | awk -F'/' '{print $1}' | jq -R . | jq -s . | grep test)
-          echo $dirs # 確認用
+          echo $dirs
+          echo ${{ fromJson(dirs) }}
           echo "::set-output name=dirs::${dirs}"
 
   helm-template:
