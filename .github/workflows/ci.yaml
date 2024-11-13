@@ -22,7 +22,7 @@ jobs:
           dirs=$(git diff --name-only origin/main -- | awk -F'/' '{print $1}' | jq -R -s 'split("\n") | map(select(length > 0)) | @json')
           echo $dirs
           # echo "::set-output name=dirs::${dirs}"
-          echo "dirs::${dirs}" >> $GITHUB_OUTPUT
+          echo "dirs=${dirs}" >> $GITHUB_OUTPUT
 
   helm-template:
     needs: set-changed-dirs
