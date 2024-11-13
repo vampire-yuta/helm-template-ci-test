@@ -9,7 +9,10 @@ on:
 
 jobs:
   set-changed-dirs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
+    outputs:
+      dirs: ${{ steps.find-changed-dirs.outputs.dirs }}
 
     steps:
       - uses: actions/checkout@v4
