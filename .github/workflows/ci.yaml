@@ -19,7 +19,7 @@ jobs:
         id: find-changed-dirs
         run: |
           git fetch
-          dirs=$(git diff --name-only origin/main HEAD | awk -F'/' '{print $1}' | grep -v .github | grep test | jq -R -s -c 'split("\n")[:-1]')
+          dirs=$(git diff --name-only origin/main HEAD | awk -F'/' '{print $1}' | grep -v .github | grep '^test-*' | jq -R -s -c 'split("\n")[:-1]')
           echo "::set-output name=dirs::${dirs}"
 
   helm-template:
