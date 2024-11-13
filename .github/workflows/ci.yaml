@@ -8,7 +8,7 @@ on:
       - testapp3/**
 
 jobs:
-  set-matrix:
+  set-changed-dirs:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +21,11 @@ jobs:
           # dirs=$(git diff --name-only HEAD..origin/main | awk -F'/' '{print $1}' | grep -v .github | grep test | jq -R . | jq -s .)
           dirs=$(git diff --name-only origin/main -- | awk -F'/' '{print $1}' | jq -R -s 'split("\n") | map(select(length > 0)) | @json')
           echo $dirs
-          echo "::set-output name=dirs::${dirs}"
+          # echo "::set-output name=dirs::${dirs}"
+          echo "dirs::${dirs}" >> $GITHUB_OUTPUT
 
   helm-template:
-    needs: set-matrix
+    needs: set-changed-dirs
     runs-on: ubuntu-latest
 
     permissions:
@@ -36,7 +37,7 @@ jobs:
     strategy:
       matrix:
         # chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
-        chart: ${{ fromJson(needs.set-matrix.outputs.dirs) }}
+        chart: ${{ fromJson(needs.set-changed-dirs.outputs.dirs) }}
 
     steps:
       - name: Checkout Code
