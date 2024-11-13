@@ -32,8 +32,8 @@ jobs:
       pull-requests: write
 
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         # chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
         chart: ${{ fromJson(needs.set-changed-dirs.outputs.dirs) }}
 
