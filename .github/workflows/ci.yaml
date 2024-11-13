@@ -14,9 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fild changed directories
+      - name: Find changed directories
         id: find-changed-dirs
         run: |
+          git fetch
           dirs=$(git diff --name-only HEAD..origin/main | awk -F'/' '{print $1}' | jq -R . | jq -s . | grep test)
           echo $dirs # 確認用
           echo "::set-output name=dirs::${dirs}"
