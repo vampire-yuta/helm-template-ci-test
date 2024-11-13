@@ -27,6 +27,11 @@ jobs:
     needs: set-changed-dirs
     runs-on: ubuntu-24.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        chart: ${{ fromJson(needs.set-changed-dirs.outputs.dirs) }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
