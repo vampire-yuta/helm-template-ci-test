@@ -18,9 +18,9 @@ jobs:
         id: find-changed-dirs
         run: |
           git fetch
-          dirs=$(git diff --name-only HEAD..origin/main | awk -F'/' '{print $1}' | jq -R . | jq -s . | grep test)
+          # dirs=$(git diff --name-only HEAD..origin/main | awk -F'/' '{print $1}' | grep -v .github | grep test | jq -R . | jq -s .)
+          dirs=$(git diff --name-only origin/main -- | awk -F'/' '{print $1}' | jq -R -s 'split("\n") | map(select(length > 0))')
           echo $dirs
-          echo ${{ fromJson(${{ dirs }}) }}
           echo "::set-output name=dirs::${dirs}"
 
   helm-template:
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         # chart: [testapp, testapp2, testapp3] # チャートディレクトリをリスト化
-        chart: ${{ fromJson(needs.set-matrix.outputs.dirs) }}
+        chart: ${{ fromJson(echo ${{ needs.set-matrix.outputs.dirs | jq -s .[0] }}) }}
 
     steps:
       - name: Checkout Code
